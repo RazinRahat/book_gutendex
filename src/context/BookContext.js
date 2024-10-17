@@ -13,28 +13,35 @@ const BookProvider = ({ children }) => {
         const savedWishlist = localStorage.getItem('wishlist');
         return savedWishlist ? JSON.parse(savedWishlist) : [];
     });
+    const [totalCount, setTotalCount] = useState(0);
+    const [nextPageUrl, setNextPageUrl] = useState(null); 
+    const [previousPageUrl, setPreviousPageUrl] = useState(null);
+
+    const fetchBooks = async (url) => {
+        setLoading(true);
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            setBooks(data.results);
+            setTotalCount(data.count);
+            setNextPageUrl(data.next);
+            setPreviousPageUrl(data.previous);
+
+            // Gather unique genres from the fetched books
+            const uniqueGenres = new Set();
+            data.results.forEach(book => {
+                book.subjects.forEach(subject => uniqueGenres.add(subject));
+            });
+            setGenres([...uniqueGenres]);
+        } catch (error) {
+            setError('Failed to fetch books.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchBooks = async () => {
-            try {
-                const response = await fetch('https://gutendex.com/books/');
-                const data = await response.json();
-                setBooks(data.results);
-
-                // Extract unique genres
-                const uniqueGenres = new Set();
-                data.results.forEach(book => {
-                    book.subjects.forEach(subject => uniqueGenres.add(subject));
-                });
-                setGenres([...uniqueGenres]);
-            } catch (error) {
-                setError('Failed to fetch books.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchBooks();
+        fetchBooks(`https://gutendex.com/books/?page=1`);
     }, []);
 
     const toggleWishlist = (bookId) => {
@@ -59,7 +66,11 @@ const BookProvider = ({ children }) => {
             setSelectedGenre,
             genres,
             wishlist,
-            toggleWishlist
+            toggleWishlist,
+            totalCount,
+            nextPageUrl,
+            previousPageUrl,
+            fetchBooks
         }}>
             {children}
         </BookContext.Provider>

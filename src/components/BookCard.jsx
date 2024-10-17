@@ -21,7 +21,7 @@ const BookCard = ({ book }) => {
                 alt={`Cover of ${book.title}`}
             />
             <div className="p-4">
-                <h2 className="font-bold text-xl mb-2 text-yellow-600">{book.title}</h2>
+                <h2 className="font-bold text-xl mb-2 text-yellow-600 line-clamp-2">{book.title}</h2>
                 <p className="text-yellow-600 text-base">Author: {author}</p>
                 <p className="text-yellow-600 text-sm line-clamp-2">Genres: {genres}</p>
                 <p className="text-yellow-600 text-xs">ID: {book.id}</p>
