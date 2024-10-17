@@ -6,10 +6,13 @@ const BookProvider = ({ children }) => {
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedGenre, setSelectedGenre] = useState('');
     const [genres, setGenres] = useState([]);
+    const [wishlist, setWishlist] = useState(() => {
+        const savedWishlist = localStorage.getItem('wishlist');
+        return savedWishlist ? JSON.parse(savedWishlist) : [];
+    });
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -18,6 +21,7 @@ const BookProvider = ({ children }) => {
                 const data = await response.json();
                 setBooks(data.results);
 
+                // Extract unique genres
                 const uniqueGenres = new Set();
                 data.results.forEach(book => {
                     book.subjects.forEach(subject => uniqueGenres.add(subject));
@@ -33,6 +37,17 @@ const BookProvider = ({ children }) => {
         fetchBooks();
     }, []);
 
+    const toggleWishlist = (bookId) => {
+        setWishlist((prevWishlist) => {
+            const updatedWishlist = prevWishlist.includes(bookId)
+                ? prevWishlist.filter(id => id !== bookId)
+                : [...prevWishlist, bookId];
+
+            localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+            return updatedWishlist;
+        });
+    };
+
     return (
         <BookContext.Provider value={{
             books,
@@ -42,7 +57,9 @@ const BookProvider = ({ children }) => {
             setSearchTerm,
             selectedGenre,
             setSelectedGenre,
-            genres
+            genres,
+            wishlist,
+            toggleWishlist
         }}>
             {children}
         </BookContext.Provider>
