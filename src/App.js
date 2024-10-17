@@ -4,10 +4,11 @@ import Home from './pages/Home';
 import Wishlist from './pages/Wishlist';
 import BookDetails from './pages/BookDetails';
 import Navbar from './components/Navbar';
+import BookProvider from './context/BookContext';
 
 function App() {
   return (
-    <div className="App">
+    <BookProvider>
       <BrowserRouter>
         <Navbar />
         <Routes>
@@ -16,7 +17,7 @@ function App() {
           <Route path="/book-details" element={<BookDetails />} />
         </Routes>
       </BrowserRouter>
-    </div>
+    </BookProvider>
   );
 }
 
